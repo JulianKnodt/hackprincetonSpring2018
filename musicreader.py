@@ -4,27 +4,31 @@ import sys
 import os
 import numpy as np
 
-
 def convert_generated_to_indexes(generated):
     notes_int = []
-    for i,j in np.nonzero(generated):
-        notes += i
+    nz = np.sort(np.transpose(np.nonzero(generated)),axis=0,)
+    for row in nz:
+      notes_int += [row[0]]
     return notes_int
 
+test = np.ceil(np.random.rand(4,4))
+print(test)
+print(convert_generated_to_indexes(test))
 
 def convert_int_to_string(ints):
     with open('indexes.csv', 'r', encoding='utf-8') as csv_file:
         note_dict = dict(csv.reader(csv_file))
-    note_dict_reversed = dict((intVal, note) for note, intVal in note_dict.iteritems())
+    note_dict_reversed = dict((intVal, note) for note, intVal in note_dict.items())
 
     string_reps = []
     for i in ints:
-        string_reps += [note_dict_reversed[i]]
+        string_reps += [note_dict_reversed[str(i+1)]]
 
     return string_reps
 
 
-def read_to_midi(generated):
+
+def read_to_midi(generated, fileName):
     streamstream = stream.Stream()
     strings = convert_int_to_string(convert_generated_to_indexes(generated))
     for row in strings:
@@ -62,5 +66,8 @@ def read_to_midi(generated):
 
         noteNew.quarterLength = float(nDuration)
         streamstream.append(noteNew)
-    fp = streamstream.write('midi', 'test.mid')
+    fp = streamstream.write('midi', fileName + '.mid')
     print("written")
+
+
+read_to_midi(test, 'TESTIN_CODE')

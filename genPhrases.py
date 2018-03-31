@@ -5,6 +5,7 @@ from tensorflow.contrib import rnn
 from tensorflow.python.ops import control_flow_ops
 from tqdm import tqdm
 from pre import sample as sampleData
+from musicreader import read_to_midi
 
 
 
@@ -73,7 +74,6 @@ updt = [w.assign_add(w_adder), bv.assign_add(bv_adder), bh.assign_add(bh_adder)]
 with tf.Session() as sess:
   init = tf.global_variables_initializer()
   saver = tf.train.Saver()
-  saver.restore(sess, './genModel/gen.ckpt')
   sess.run(init)
   #updt= contrastive_divergence(learning_rate)
   for epoch in tqdm(range(num_epochs)):
@@ -93,4 +93,6 @@ with tf.Session() as sess:
     if not any(samples[i, :]):
       continue
     S = np.reshape(samples[i,:], (time_steps, note_range))
+    read_to_midi(S, "standard")
+    read_to_midi(np.transpose(S), "transposed")
     print(S)
