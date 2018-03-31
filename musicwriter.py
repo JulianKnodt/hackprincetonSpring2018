@@ -1,18 +1,14 @@
-# Handles initially processing the music
 from music21 import *
-import numpy as np
-import pandas as pd
 import csv
-from tensorflow import SparseTensor
 import sys
 import os
+import pandas as pd
 from collections import defaultdict
-from scipy import sparse
 
 
 def parseStream(filename, s):
     orig_stdout = sys.stdout
-    f = open("GoldbergVariationsRawData.csv", 'w')
+    f = open('GoldbergFirstOneHundred.csv', 'w')
 
     sys.stdout = f
 
@@ -131,59 +127,9 @@ def convert_notes_to_indexes(notes):
 
     return X, Y
 
-def split_into_phrases(phrase_positions, notesList):
-    phrases = [notesList[x:y] for x, y in zip(phrase_positions, phrase_positions[1:])]
 
-
-def on_off_representation(streams, phraseStarts):
-    with open('indexes.csv', 'r', encoding='utf-8') as csv_file:
-        note_dict = dict(csv.reader(csv_file))
-
-    phrases = []
-    x = 0
-
-    for stream in streams:
-        for note in stream.notesAndRests:
-            if (x in phraseStarts):
-                if (x != 0):
-                    print(rows)
-                    print(cols)
-                    print(data)
-                    print(step)
-                    print(len(note_dict))
-                    bsr = sparse.bsr_matrix((np.array(data), (np.array(rows), np.array(cols)))).toarray()
-                    shape = (len(note_dict), step)
-                    bsr.resize(shape)
-                    phrases.append(bsr)
-                step = 0
-                current_notes = []
-                rows = []
-                cols = []
-                data = []
-
-            thirty_two_length = int(note.quarterLength * 8)
-            if (thirty_two_length != 0):
-                current_notes.append(note)
-                for n in current_notes:
-                    if(str(type(note)) == str("<class 'music21.note.Rest'>")):
-                        string_rep = "R0" + str(n.quarterLength)
-                    if(str(type(note)) == str("<class 'music21.note.Note'>")):
-                        string_rep = str(n.pitch) + str(n.quarterLength)
-                    rows.append(int(note_dict[string_rep]))
-                    cols.append(step)
-                    rows.append(int(note_dict[string_rep]))
-                    cols.append(step + thirty_two_length - 1)
-                    data += [1,1]
-                step += thirty_two_length
-                current_notes = []
-            else:
-                current_notes += note
-            x += 1
-    return phrases
-
+filename = r'988-v01.mid'
+phrase_divisions = parseStream(filename)
 training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
 build_note_dict(training_notes)
-filename = '988-v01.mid'
-streams = converter.parse(filename)
-phraseStarts = parseStream(filename, streams)
-on_off_representation(streams, phraseStarts)
+convert_notes_to_indexes(training_notes)
