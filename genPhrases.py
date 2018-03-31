@@ -1,15 +1,15 @@
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 from tensorflow.contrib import rnn
 from tensorflow.python.ops import control_flow_ops
 from tqdm import tqdm
+from pre import sample as sampleData
+
 
 
 def randSparseTensor(shape):
   return np.round(np.random.rand(shape[0], shape[1]))
-
-
-
 
 note_range = 470 # num of notes
 # this file generates phrases based on input phrases 
@@ -17,9 +17,9 @@ def getPhrases(test=False):
   if test:
     amtSample = 10
     return list(("CLASSIFICATION", randSparseTensor((512,note_range))) for _ in range(amtSample))
+  return sampleData()
 
-  return None
-phrases = getPhrases(True)
+phrases = getPhrases(False)
 # hyperparameters
 lr = tf.constant(0.005, tf.float32)
 batch_size = 100
