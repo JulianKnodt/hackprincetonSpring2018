@@ -1,5 +1,7 @@
+*.ckpt
 .Python
 /bin
 /lib
 /include
 pip-selfcheck.json
+*.swp
