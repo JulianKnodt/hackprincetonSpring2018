@@ -36,9 +36,9 @@ num_epochs = 200
 activation_function = tf.sigmoid
 
 x = tf.placeholder(tf.float32, shape=[None, num_input], name="x")
-w = tf.Variable(tf.random_normal([num_input, num_hidden], 0.01), name="weight")
-bh = tf.Variable(tf.zeros([1, num_hidden], tf.float32, name="bias_hidden"))
-bv = tf.Variable(tf.zeros([1, num_input], tf.float32, name="bias_visible"))
+w = tf.get_variable('weight', initializer=tf.Variable(tf.random_normal([num_input, num_hidden], 0.01), name="weight"))
+bh = tf.get_variable('bias_hidden', initializer=tf.Variable(tf.zeros([1, num_hidden], tf.float32, name="bias_hidden")))
+bv = tf.get_variable('bias_visible', initializer=tf.Variable(tf.zeros([1, num_input], tf.float32, name="bias_visible")))
 
 def sample(probs):
   return tf.floor(probs + tf.random_uniform(tf.shape(probs),0,1))
@@ -69,9 +69,11 @@ tf.subtract(tf.matmul(tf.transpose(x), h), tf.matmul(tf.transpose(x_sample), h_s
 bv_adder = tf.multiply(lr / size_bt, tf.reduce_sum(tf.subtract(x, x_sample), 0, True))
 bh_adder = tf.multiply(lr / size_bt, tf.reduce_sum(tf.subtract(h, h_sample), 0, True))
 updt = [w.assign_add(w_adder), bv.assign_add(bv_adder), bh.assign_add(bh_adder)]
-with tf.Session() as sess:
 
+with tf.Session() as sess:
   init = tf.global_variables_initializer()
+  saver = tf.train.Saver()
+  saver.restore(sess, './genModel/gen.ckpt')
   sess.run(init)
   #updt= contrastive_divergence(learning_rate)
   for epoch in tqdm(range(num_epochs)):
@@ -84,8 +86,8 @@ with tf.Session() as sess:
       for i in range(1, len(phrase), batch_size):
         tr_x = phrase[i:i+batch_size]
         sess.run(updt, feed_dict={x: tr_x})
-
-  NUM_SAMPLE_OUTPUTS = 20
+  _save_path = saver.save(sess, './genModel/gen.ckpt')
+  NUM_SAMPLE_OUTPUTS = 50
   samples = gibbs_sample(1).eval(session = sess, feed_dict = {x: np.zeros((NUM_SAMPLE_OUTPUTS, num_input))})
   for i in range(samples.shape[0]):
     if not any(samples[i, :]):

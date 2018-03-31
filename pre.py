@@ -41,7 +41,6 @@ def parseStream(filename, s):
             for thisNote in i.notesAndRests.stream():
 
                 if(str(type(thisNote)) == str("<class 'music21.note.Rest'>")):
-                    print("R0" + str(thisNote.quarterLength))
                     noteCounter = noteCounter + 1
                 if(str(type(thisNote)) == str("<class 'music21.note.Note'>")):
                     thisNote = interval.transposeNote(thisNote, intervalo)
@@ -53,7 +52,8 @@ def parseStream(filename, s):
                         del previousDurations30[0]
                     n = len(previousChanges24)
                     bb = len(previousDurations30)
-                    # if (n > 7):
+
+
                     # Test last 12 notes equal
                     counter = 0
                     if (n > 12 and previousChanges24[n-6:n-1] == previousChanges24[n-12:n-7]):
@@ -63,7 +63,6 @@ def parseStream(filename, s):
                     #     if (n > 8 and previousChanges24[n-3] == previousChanges24[n-7]):
                     #         if (n > 8 and previousChanges24[n-4] == previousChanges24[n-8]):
                     #             if (thisNote.quarterLength != 0.25):
-                    #                 print("Phrase End 8")
                     #                 previousChanges24 = []
                     n = len(previousChanges24)
                     if (n > 20 and previousChanges24[n-11:n-1] == previousChanges24[n-21:n-11]):
@@ -74,7 +73,6 @@ def parseStream(filename, s):
                         previousChanges24 = []
                     if (thisNote.quarterLength == 1.0 or thisNote.quarterLength == 2.0):
                         if (previousDurations30[bb-5] == 0.25 and previousDurations30[bb-4] == 0.25 and previousDurations30[bb-3] == 0.25 and previousDurations30[bb-2] == 0.25):
-                            # print("Phrase End quarter after sixteenths")
                             phraseStarts.append(noteCounter)
                     noteCounter = noteCounter + 1
                             previousNote = thisNote
