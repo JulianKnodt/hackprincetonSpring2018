@@ -181,9 +181,10 @@ def on_off_representation(streams, phraseStarts):
             x += 1
     return phrases
 
-training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
-build_note_dict(training_notes)
-filename = '988-v01.mid'
-streams = converter.parse(filename)
-phraseStarts = parseStream(filename, streams)
-on_off_representation(streams, phraseStarts)
+def main():
+    training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
+    build_note_dict(training_notes)
+    filename = '988-v01.mid'
+    streams = converter.parse(filename)
+    phraseStarts = parseStream(filename, streams)
+    on_off_representation(streams, phraseStarts)
