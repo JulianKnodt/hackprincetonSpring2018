@@ -2,8 +2,16 @@ from music21 import *
 import csv
 import sys
 import os
+import numpy as np
 
-orig_stdout = sys.stdout
+
+def convert_generated_to_indexes(generated):
+    notes = []
+    for i,j in np.nonzero(generated):
+        notes += i
+    print(notes)
+    
+
 orig_stdout = sys.stdout
 d = open('notedata.txt', 'w')
 
