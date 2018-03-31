@@ -124,7 +124,7 @@ def convert_notes_to_indexes(notes):
 
 def parseStream(filename, s):
     orig_stdout = sys.stdout
-    f = open('GoldbergFirstOneHundred.csv', 'w')
+    f = open("GoldbergVariationsRawData.csv", 'w')
 
     sys.stdout = f
 
@@ -276,10 +276,8 @@ def on_off_representation(streams, phraseStarts):
                         string_rep = "R0" + str(n.quarterLength)
                     if(str(type(note)) == str("<class 'music21.note.Note'>")):
                         string_rep = str(n.pitch) + str(n.quarterLength)
-                    rows.append(int(note_dict[string_rep]))
-                    cols.append(step)
-                    rows.append(int(note_dict[string_rep]))
-                    cols.append(step + thirty_two_length - 1)
+                    indices.append([int(note_dict[string_rep]),step])
+                    indices.append([int(note_dict[string_rep]),step + thirty_two_length - 1])
                     data += [1,1]
                 step += thirty_two_length
                 current_notes = []
@@ -295,30 +293,3 @@ def sample():
   streams = converter.parse(filename)
   phraseStarts = parseStream(filename, streams)
   return on_off_representation(streams, phraseStarts)
-def on_off_representation(stream):
-
-    with open('indexes.csv', 'r', encoding='utf-8') as csv_file:
-        note_dict = dict(csv.reader(csv_file))
-
-    step = 0
-    current_notes = []
-    indices = []
-    data = []
-    for note in stream.notes:
-        thirty_two_length = int(note.quarterLength * 8)
-        if (thirty_two_length != 0):
-            current_notes.append(note)
-            for n in current_notes:
-                string_rep = str(n.pitch) + str(n.quarterLength)
-                indices.append([int(note_dict[string_rep]),step])
-                indices.append([int(note_dict[string_rep]),step + thirty_two_length - 1])
-                data += [1,1]
-            step += thirty_two_length
-            current_notes = []
-        else:
-            current_notes += note
-    print(indices)
-    print(data)
-    phrase = SparseTensor(indices, data, (len(note_dict), int(stream.duration.quarterLength * 8)))
-    return phrase
-
