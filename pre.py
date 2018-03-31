@@ -11,7 +11,7 @@ from collections import defaultdict
 
 def parseStream(filename, s):
     orig_stdout = sys.stdout
-    f = open('GoldbergFirstOneHundred.csv', 'w')
+    f = open("GoldbergVariationsRawData.csv", 'w')
 
     sys.stdout = f
 
@@ -157,7 +157,10 @@ def on_off_representation(streams, phraseStarts):
             if (thirty_two_length != 0):
                 current_notes.append(note)
                 for n in current_notes:
-                    string_rep = str(n.pitch) + str(n.quarterLength)
+                    if(str(type(note)) == str("<class 'music21.note.Rest'>")):
+                        string_rep = "R0" + str(n.quarterLength)
+                    if(str(type(note)) == str("<class 'music21.note.Note'>")):
+                        string_rep = str(n.pitch) + str(n.quarterLength)
                     indices.append([int(note_dict[string_rep]),step])
                     indices.append([int(note_dict[string_rep]),step + thirty_two_length - 1])
                     data += [1,1]
@@ -168,13 +171,10 @@ def on_off_representation(streams, phraseStarts):
             x += 1
     return phrase_tensors
 
-
-
+training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
+build_note_dict(training_notes)
 filename = '988-v01.mid'
 streams = converter.parse(filename)
 phraseStarts = parseStream(filename, streams)
 print(phraseStarts)
-training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
-build_note_dict(training_notes)
-convert_notes_to_indexes(training_notes)
 on_off_representation(streams, phraseStarts)
