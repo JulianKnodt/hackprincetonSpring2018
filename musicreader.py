@@ -2,28 +2,37 @@ from music21 import *
 import csv
 import sys
 import os
+import numpy as np
 
-orig_stdout = sys.stdout
-orig_stdout = sys.stdout
-d = open('notedata.txt', 'w')
 
-# sys.stdout = d
+def convert_generated_to_indexes(generated):
+    notes_int = []
+    for i,j in np.nonzero(generated):
+        notes += i
+    return notes_int
 
-f = open('GoldbergShortLong.csv', 'r')
-reader = csv.reader(f)
 
-streamstream = stream.Stream()
-firstrow = True
-for row in reader:
-    counter = 2
-    if (firstrow):
-        firstrow = False
-        continue
-    if (str(row)[2:5] != 'end' and str(row)[2:7] != "Notes"):
+def convert_int_to_string(ints):
+    with open('indexes.csv', 'r', encoding='utf-8') as csv_file:
+        note_dict = dict(csv.reader(csv_file))
+    note_dict_reversed = dict((intVal, note) for note, intVal in note_dict.iteritems())
+
+    string_reps = []
+    for i in ints:
+        string_reps += [note_dict_reversed[i]]
+
+    return string_reps
+
+
+def read_to_midi(generated):
+    streamstream = stream.Stream()
+    strings = convert_int_to_string(convert_generated_to_indexes(generated))
+    for row in strings:
+        counter = 0
         nPitch = str(row)[counter]
         counter = counter+1
         nPitch += str(row)[counter]
-        if (str(row)[3] == '#' or str(row)[3] == '-'):
+        if (str(row)[1] == '#' or str(row)[1] == '-'):
             counter = counter+1
             nPitch += str(row)[counter]
         nDuration = ''
@@ -53,10 +62,5 @@ for row in reader:
 
         noteNew.quarterLength = float(nDuration)
         streamstream.append(noteNew)
-
-print(len(streamstream))
-print("Reached")
-
-
-fp = streamstream.write('midi', 'test.mid')
-print("written")
+    fp = streamstream.write('midi', 'test.mid')
+    print("written")

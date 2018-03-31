@@ -128,6 +128,8 @@ def convert_notes_to_indexes(notes):
     return X, Y
 
 
+
+
 filename = r'988-v01.mid'
 phrase_divisions = parseStream(filename)
 training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
