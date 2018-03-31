@@ -17,7 +17,7 @@ def getPhrases(test=False):
   if test:
     amtSample = 10
     return list(("CLASSIFICATION", randSparseTensor((512,note_range))) for _ in range(amtSample))
-  return sampleData()
+  return list(("CLASSIFICATION", np.transpose(phrase)) for phrase in sampleData())
 
 phrases = getPhrases(False)
 # hyperparameters
@@ -33,7 +33,7 @@ num_hidden = 128
 time_steps = 16
 num_input = time_steps * note_range
 num_epochs = 200
-activation_function = tf.nn.relu
+activation_function = tf.sigmoid
 
 x = tf.placeholder(tf.float32, shape=[None, num_input], name="x")
 w = tf.Variable(tf.random_normal([num_input, num_hidden], 0.01), name="weight")
@@ -86,9 +86,9 @@ with tf.Session() as sess:
         sess.run(updt, feed_dict={x: tr_x})
 
   NUM_SAMPLE_OUTPUTS = 20
-  sample = gibbs_sample(1).eval(session = sess, feed_dict = {x: np.zeros((NUM_SAMPLE_OUTPUTS, num_input))})
-  for i in range(sample.shape[0]):
-    if not any(sample[i, :]):
+  samples = gibbs_sample(1).eval(session = sess, feed_dict = {x: np.zeros((NUM_SAMPLE_OUTPUTS, num_input))})
+  for i in range(samples.shape[0]):
+    if not any(samples[i, :]):
       continue
-    S = np.reshape(sample[i,:], (time_steps, note_range))
+    S = np.reshape(samples[i,:], (time_steps, note_range))
     print(S)

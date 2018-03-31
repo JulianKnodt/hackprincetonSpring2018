@@ -79,7 +79,6 @@ def parseStream(filename, s):
                     noteCounter = noteCounter + 1
                             previousNote = thisNote
 
-sys.stdout = orig_stdout
     return phraseStarts
 
 
@@ -154,9 +153,11 @@ def on_off_representation(streams, phraseStarts):
 return phrases
 
 def sample():
-    training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
-    build_note_dict(training_notes)
-    filename = '988-v01.mid'
-    streams = converter.parse(filename)
-    phraseStarts = parseStream(filename, streams)
-    on_off_representation(streams, phraseStarts)
+  print("reading data")
+  training_notes = pd.read_csv("./GoldbergVariationsRawData.csv", index_col=None)
+  build_note_dict(training_notes)
+  filename = '988-v01.mid'
+  streams = converter.parse(filename)
+  phraseStarts = parseStream(filename, streams)
+  return on_off_representation(streams, phraseStarts)
+
