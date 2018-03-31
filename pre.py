@@ -262,6 +262,7 @@ def on_off_representation(streams, phraseStarts):
             if (x in phraseStarts):
                 if (x != 0):
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                     print(rows)
                     print(cols)
@@ -269,6 +270,8 @@ def on_off_representation(streams, phraseStarts):
                     print(step)
                     print(len(note_dict))
 >>>>>>> formatted input
+=======
+>>>>>>> put test code into sample function
                     bsr = sparse.bsr_matrix((np.array(data), (np.array(rows), np.array(cols)))).toarray()
                     shape = (len(note_dict), step)
                     bsr.resize(shape)
@@ -301,6 +304,7 @@ def on_off_representation(streams, phraseStarts):
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 def sample():
   training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
   build_note_dict(training_notes)
@@ -318,6 +322,9 @@ on_off_representation(streams, phraseStarts)
 >>>>>>> formatted input
 =======
 def main():
+=======
+def sample():
+>>>>>>> put test code into sample function
     training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
     build_note_dict(training_notes)
     filename = '988-v01.mid'
