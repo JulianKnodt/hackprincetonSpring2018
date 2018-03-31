@@ -12,21 +12,21 @@ from scipy import sparse
 
 def parseStream(filename, s):
     orig_stdout = sys.stdout
-    f = open("GoldbergVariationsRawData.csv", 'w')
-
-    sys.stdout = f
-
-
+    #f = open("GoldbergVariationsRawData.csv", 'w')
+    
+    #sys.stdout = f
+    
+    
     previousDurations30 = []
     previousChanges24 = []
     phraseStarts = [0]
     noteCounter = 0
-
+    
     # for filename in os.listdir(path):
     for i in range(1):
         for i in s:
             previousNote = note.Note("C8")
-
+            
             count = 0
             timeSig = ""
             keySig = ""
@@ -38,18 +38,18 @@ def parseStream(filename, s):
                     count = count + 1
                 if (count > 3):
                     break
-
+        
             aNote = note.Note('c4')
             if (len(keySig) > 0):
                 notestr = keySig[0].lower() + '4'
                 bNote = note.Note(notestr)
-            intervalo = interval.notesToInterval(bNote, aNote)
-
-            for thisNote in i.notesAndRests.stream():
-
-                if(str(type(thisNote)) == str("<class 'music21.note.Rest'>")):
-                    print("R0" + str(thisNote.quarterLength))
-                    noteCounter = noteCounter + 1
+    intervalo = interval.notesToInterval(bNote, aNote)
+        
+        for thisNote in i.notesAndRests.stream():
+            
+            if(str(type(thisNote)) == str("<class 'music21.note.Rest'>")):
+                print("R0" + str(thisNote.quarterLength))
+                noteCounter = noteCounter + 1
                 if(str(type(thisNote)) == str("<class 'music21.note.Note'>")):
                     thisNote = interval.transposeNote(thisNote, intervalo)
                     previousDurations30.append(thisNote.quarterLength)
@@ -62,47 +62,47 @@ def parseStream(filename, s):
                     bb = len(previousDurations30)
                     # if (n > 7):
                     #    print(previousChanges24[n-6:])
-
-
+                    
+                    
                     # Test last 12 notes equal
                     counter = 0
                     if (n > 12 and previousChanges24[n-6:n-1] == previousChanges24[n-12:n-7]):
                         phraseStarts.append(noteCounter - 1)
                         previousChanges24 = []
-
+                    
                     # if (n > 8 and previousChanges24[n-2] == previousChanges24[n-6]):
                     #     if (n > 8 and previousChanges24[n-3] == previousChanges24[n-7]):
                     #         if (n > 8 and previousChanges24[n-4] == previousChanges24[n-8]):
                     #             if (thisNote.quarterLength != 0.25):
                     #                 print("Phrase End 8")
                     #                 previousChanges24 = []
-
+                    
                     n = len(previousChanges24)
                     if (n > 20 and previousChanges24[n-11:n-1] == previousChanges24[n-21:n-11]):
                         phraseStarts.append(noteCounter - 1)
                         previousChanges24 = []
-
+                    
                     if (n > 24 and previousChanges24[n-11:n-1] == previousChanges24[n-21:n-11]):
                         phraseStarts.append(noteCounter - 1)
                         previousChanges24 = []
-
+                    
                     print(str(thisNote.pitch) + str(thisNote.quarterLength))
                     if (thisNote.quarterLength == 1.0 or thisNote.quarterLength == 2.0):
                         if (previousDurations30[bb-5] == 0.25 and previousDurations30[bb-4] == 0.25 and previousDurations30[bb-3] == 0.25 and previousDurations30[bb-2] == 0.25):
                             # print("Phrase End quarter after sixteenths")
                             phraseStarts.append(noteCounter)
                     noteCounter = noteCounter + 1
-                    previousNote = thisNote
+                            previousNote = thisNote
 
-    sys.stdout = orig_stdout
+sys.stdout = orig_stdout
     return phraseStarts
 
 
 def build_note_dict(notes):
-
+    
     with open('indexes.csv', 'r', encoding='utf-8') as csv_file:
         note_dict = dict(csv.reader(csv_file))
-
+    
     noteList = []
     for key, note in notes.itertuples():
         if note not in note_dict:
@@ -110,26 +110,26 @@ def build_note_dict(notes):
     possible_vals = sorted(set(noteList))
     startIndex = len(note_dict) + 1
     note_dict.update(dict([(note, index + startIndex) for index, note in enumerate(possible_vals)]))
-
+    
     with open('indexes.csv', 'w') as csv_file:
         writer = csv.writer(csv_file)
         for key, note in note_dict.items():
             writer.writerow([key, note])
 
-    return note_dict
+return note_dict
 
 def convert_notes_to_indexes(notes):
-
+    
     with open('indexes.csv', 'r', encoding='utf-8') as csv_file:
         note_dict = dict(csv.reader(csv_file))
-
+    
     noteIndexes = []
     for key, note in notes.itertuples():
         noteIndexes.append(note_dict[note])
     X = zip(noteIndexes[0::1], noteIndexes[2::1])
     Y = noteIndexes[1::1]
 
-    return X, Y
+return X, Y
 
 def split_into_phrases(phrase_positions, notesList):
     phrases = [notesList[x:y] for x, y in zip(phrase_positions, phrase_positions[1:])]
@@ -138,19 +138,14 @@ def split_into_phrases(phrase_positions, notesList):
 def on_off_representation(streams, phraseStarts):
     with open('indexes.csv', 'r', encoding='utf-8') as csv_file:
         note_dict = dict(csv.reader(csv_file))
-
+    
     phrases = []
     x = 0
-
+    
     for stream in streams:
         for note in stream.notesAndRests:
             if (x in phraseStarts):
                 if (x != 0):
-                    print(rows)
-                    print(cols)
-                    print(data)
-                    print(step)
-                    print(len(note_dict))
                     bsr = sparse.bsr_matrix((np.array(data), (np.array(rows), np.array(cols)))).toarray()
                     shape = (len(note_dict), step)
                     bsr.resize(shape)
@@ -160,7 +155,7 @@ def on_off_representation(streams, phraseStarts):
                 rows = []
                 cols = []
                 data = []
-
+        
             thirty_two_length = int(note.quarterLength * 8)
             if (thirty_two_length != 0):
                 current_notes.append(note)
@@ -171,19 +166,22 @@ def on_off_representation(streams, phraseStarts):
                         string_rep = str(n.pitch) + str(n.quarterLength)
                     rows.append(int(note_dict[string_rep]))
                     cols.append(step)
-                    rows.append(int(note_dict[string_rep]))
-                    cols.append(step + thirty_two_length - 1)
-                    data += [1,1]
+                    #rows.append(int(note_dict[string_rep]))
+                    #cols.append(step + thirty_two_length - 1)
+                    data += [1]
+                #data += [1,1]
                 step += thirty_two_length
                 current_notes = []
             else:
                 current_notes += note
-            x += 1
-    return phrases
+    x += 1
+return phrases
 
-training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
-build_note_dict(training_notes)
-filename = '988-v01.mid'
-streams = converter.parse(filename)
-phraseStarts = parseStream(filename, streams)
-on_off_representation(streams, phraseStarts)
+def sample():
+    training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
+    build_note_dict(training_notes)
+    filename = '988-v01.mid'
+    streams = converter.parse(filename)
+    phraseStarts = parseStream(filename, streams)
+    on_off_representation(streams, phraseStarts)
+
