@@ -7,6 +7,7 @@ from tensorflow import SparseTensor
 import sys
 import os
 from collections import defaultdict
+from scipy import sparse
 
 
 def parseStream(filename, s):
@@ -138,19 +139,26 @@ def on_off_representation(streams, phraseStarts):
     with open('indexes.csv', 'r', encoding='utf-8') as csv_file:
         note_dict = dict(csv.reader(csv_file))
 
-    phrase_tensors = []
+    phrases = []
     x = 0
 
     for stream in streams:
         for note in stream.notesAndRests:
             if (x in phraseStarts):
                 if (x != 0):
-                    print(indices)
+                    print(rows)
+                    print(cols)
                     print(data)
-                    phrase_tensors.append(SparseTensor(indices, data, (len(note_dict), int(stream.duration.quarterLength * 8))))
+                    print(step)
+                    print(len(note_dict))
+                    bsr = sparse.bsr_matrix((np.array(data), (np.array(rows), np.array(cols)))).toarray()
+                    shape = (len(note_dict), step)
+                    bsr.resize(shape)
+                    phrases.append(bsr)
                 step = 0
                 current_notes = []
-                indices = []
+                rows = []
+                cols = []
                 data = []
 
             thirty_two_length = int(note.quarterLength * 8)
@@ -161,20 +169,21 @@ def on_off_representation(streams, phraseStarts):
                         string_rep = "R0" + str(n.quarterLength)
                     if(str(type(note)) == str("<class 'music21.note.Note'>")):
                         string_rep = str(n.pitch) + str(n.quarterLength)
-                    indices.append([int(note_dict[string_rep]),step])
-                    indices.append([int(note_dict[string_rep]),step + thirty_two_length - 1])
+                    rows.append(int(note_dict[string_rep]))
+                    cols.append(step)
+                    rows.append(int(note_dict[string_rep]))
+                    cols.append(step + thirty_two_length - 1)
                     data += [1,1]
                 step += thirty_two_length
                 current_notes = []
             else:
                 current_notes += note
             x += 1
-    return phrase_tensors
+    return phrases
 
 training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
 build_note_dict(training_notes)
 filename = '988-v01.mid'
 streams = converter.parse(filename)
 phraseStarts = parseStream(filename, streams)
-print(phraseStarts)
 on_off_representation(streams, phraseStarts)
