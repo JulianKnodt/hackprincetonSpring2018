@@ -7,7 +7,7 @@ from collections import defaultdict
 
 for i in range(1):
     orig_stdout = sys.stdout
-    f = open('GoldbergFirstOneHundred.csv', 'w')
+    f = open('GoldbergVariationsRawData.csv', 'w')
 
     sys.stdout = f
 
@@ -75,7 +75,7 @@ for i in range(1):
                     noteCounter = noteCounter + 1
                 if(str(type(thisNote)) == str("<class 'music21.note.Note'>")):
                     offseto = thisNote.offset
-                    #thisNote = interval.transposeNote(thisNote, intervalo)
+                    thisNote = interval.transposeNote(thisNote, intervalo)
 
                     previousDurations30.append(thisNote.quarterLength)
                     previousChanges24.append(str(interval.Interval(thisNote, previousNote))[len(str(interval.Interval(thisNote, previousNote))) - 2])
@@ -93,7 +93,7 @@ for i in range(1):
                     counter = 0
                     if (n > 12 and previousChanges24[n-6:n-1] == previousChanges24[n-12:n-7] and (offseto % breako == 0 or offseto % breako == 1)):
                         phraseStarts.append(noteCounter - 1)
-                        phraseTypes.append(6)
+                        phraseTypes.append(1)
                         currentpLength = 0
                         previousChanges24 = []
 
@@ -107,7 +107,7 @@ for i in range(1):
                     n = len(previousChanges24)
                     if (n > 20 and previousChanges24[n-11:n-1] == previousChanges24[n-21:n-11] and (offseto % breako == 0 or offseto % breako == 1)):
                         phraseStarts.append(noteCounter - 1)
-                        phraseTypes.append(10)
+                        phraseTypes.append(2)
                         previousChanges24 = []
                         currentpLength = 0
 
@@ -118,20 +118,20 @@ for i in range(1):
                         if (len(previousDurations30) > 5 and previousDurations30[bb-5] == 0.25 and previousDurations30[bb-4] == 0.25 and previousDurations30[bb-3] == 0.25 and previousDurations30[bb-2] == 0.25):
                             # print("Phrase End quarter after sixteenths")
                             phraseStarts.append(noteCounter)
-                            phraseTypes.append(4)
+                            phraseTypes.append(3)
                             currentpLength = 0
                             previousChanges24 = []
 
                     if (thisNote.quarterLength >= 2.0):
                         if (len(previousDurations30) > 3 and previousDurations30[bb-2] < 1 and previousDurations30[bb-3] < 1):
                             phraseStarts.append(noteCounter)
-                            phraseTypes.append(2)
+                            phraseTypes.append(4)
                             currentpLength = 0
                             previousChanges24 = []
 
                     if (currentpLength >= 50 and offseto % breako == 0):
                         phraseStarts.append(noteCounter)
-                        phraseTypes.append(50)
+                        phraseTypes.append(5)
                         currentpLength = 0
                         previousChanges24 = []
 
