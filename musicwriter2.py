@@ -1,3 +1,4 @@
+
 from music21 import *
 import csv
 import sys
@@ -5,6 +6,14 @@ import os
 from collections import defaultdict
 
 for i in range(1):
+
+    orig_stdout = sys.stdout
+    f = open('GoldbergVariationsRawData.csv', 'w')
+
+    sys.stdout = f
+
+
+
     previousDurations30 = []
     previousChanges24 = []
     phraseStarts = [0]

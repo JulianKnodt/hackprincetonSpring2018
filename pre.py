@@ -174,6 +174,7 @@ def on_off_representation(streams, phraseStarts):
             x += 1
     return phrases
 
+
 def on_off_representation_from_csv(notes, phraseStarts):
     with open('indexes.csv', 'r', encoding='utf-8') as csv_file:
         note_dict = dict(csv.reader(csv_file))
