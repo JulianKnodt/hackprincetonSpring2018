@@ -47,6 +47,7 @@ def parseStream(s):
             for thisNote in i.notesAndRests.stream():
 
                 if(str(type(thisNote)) == str("<class 'music21.note.Rest'>")):
+                    print("R0" + str(thisNote.quarterLength))
                     noteCounter = noteCounter + 1
                 if(str(type(thisNote)) == str("<class 'music21.note.Note'>")):
                     thisNote = interval.transposeNote(thisNote, intervalo)
@@ -90,6 +91,7 @@ def parseStream(s):
                     noteCounter = noteCounter + 1
                     previousNote = thisNote
 
+    sys.stdout = orig_stdout
     return phraseStarts
 
 

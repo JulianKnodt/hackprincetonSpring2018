@@ -6,7 +6,17 @@ import pandas as pd
 from collections import defaultdict
 
 
+<<<<<<< HEAD
 def parseStream(s):
+=======
+def parseStream(filename, s):
+    orig_stdout = sys.stdout
+    f = open("GoldbergVariationsRawData.csv", 'w')
+
+    sys.stdout = f
+
+
+>>>>>>> 2c4c91b216a59b129bdc605037edeb3baa1fefcf
     previousDurations30 = []
     previousChanges24 = []
     phraseStarts = [0]
@@ -38,6 +48,10 @@ def parseStream(s):
             for thisNote in i.notesAndRests.stream():
 
                 if(str(type(thisNote)) == str("<class 'music21.note.Rest'>")):
+<<<<<<< HEAD
+=======
+                    print("R0" + str(thisNote.quarterLength))
+>>>>>>> 2c4c91b216a59b129bdc605037edeb3baa1fefcf
                     noteCounter = noteCounter + 1
                 if(str(type(thisNote)) == str("<class 'music21.note.Note'>")):
                     thisNote = interval.transposeNote(thisNote, intervalo)
@@ -50,6 +64,10 @@ def parseStream(s):
                     n = len(previousChanges24)
                     bb = len(previousDurations30)
                     # if (n > 7):
+<<<<<<< HEAD
+=======
+                    #    print(previousChanges24[n-6:])
+>>>>>>> 2c4c91b216a59b129bdc605037edeb3baa1fefcf
 
 
                     # Test last 12 notes equal
@@ -62,6 +80,10 @@ def parseStream(s):
                     #     if (n > 8 and previousChanges24[n-3] == previousChanges24[n-7]):
                     #         if (n > 8 and previousChanges24[n-4] == previousChanges24[n-8]):
                     #             if (thisNote.quarterLength != 0.25):
+<<<<<<< HEAD
+=======
+                    #                 print("Phrase End 8")
+>>>>>>> 2c4c91b216a59b129bdc605037edeb3baa1fefcf
                     #                 previousChanges24 = []
 
                     n = len(previousChanges24)
@@ -73,8 +95,15 @@ def parseStream(s):
                         phraseStarts.append(noteCounter - 1)
                         previousChanges24 = []
 
+<<<<<<< HEAD
                     if (thisNote.quarterLength == 1.0 or thisNote.quarterLength == 2.0):
                         if (previousDurations30[bb-5] == 0.25 and previousDurations30[bb-4] == 0.25 and previousDurations30[bb-3] == 0.25 and previousDurations30[bb-2] == 0.25):
+=======
+                    print(str(thisNote.pitch) + str(thisNote.quarterLength))
+                    if (thisNote.quarterLength == 1.0 or thisNote.quarterLength == 2.0):
+                        if (previousDurations30[bb-5] == 0.25 and previousDurations30[bb-4] == 0.25 and previousDurations30[bb-3] == 0.25 and previousDurations30[bb-2] == 0.25):
+                            # print("Phrase End quarter after sixteenths")
+>>>>>>> 2c4c91b216a59b129bdc605037edeb3baa1fefcf
                             phraseStarts.append(noteCounter)
                     noteCounter = noteCounter + 1
                     previousNote = thisNote
@@ -116,3 +145,14 @@ def convert_notes_to_indexes(notes):
 
     return X, Y
 
+<<<<<<< HEAD
+=======
+
+
+
+filename = r'988-v01.mid'
+phrase_divisions = parseStream(filename)
+training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
+build_note_dict(training_notes)
+convert_notes_to_indexes(training_notes)
+>>>>>>> 2c4c91b216a59b129bdc605037edeb3baa1fefcf
