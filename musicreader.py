@@ -70,7 +70,10 @@ def read_to_midi(generated, fileName):
                         start = True
                 nDuration = float(float(numerator)/float(denominator))
 
-        noteNew.quarterLength = float(nDuration)
+        try:
+            noteNew.quarterLength = float(nDuration)
+        except ValueError:
+            continue
         streamstream.append(noteNew)
     fp = streamstream.write('midi', fileName + '.mid')
     print("written" + fileName)
