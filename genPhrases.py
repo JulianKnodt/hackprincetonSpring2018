@@ -23,7 +23,7 @@ def getPhrases(test=False):
 phrases = getPhrases(False)
 print(len(phrases))
 # hyperparameters
-lr = tf.constant(0.01, tf.float32)
+lr = tf.constant(0.025, tf.float32)
 batch_size = 50
 
 # neural net parameters
@@ -34,7 +34,7 @@ batch_size = 50
 num_hidden = 371
 time_steps = 72
 num_input = time_steps * note_range
-num_epochs = 30
+num_epochs = 10
 activation_function = tf.sigmoid
 
 x = tf.placeholder(tf.float32, shape=[None, num_input], name="x")
