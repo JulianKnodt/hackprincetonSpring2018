@@ -24,7 +24,7 @@ phrases = getPhrases(False)
 print(len(phrases))
 # hyperparameters
 lr = tf.constant(0.05, tf.float32)
-batch_size = 1000
+batch_size = 1200
 
 # neural net parameters
 # num of visible nodes must match input size or input size must be truncated
@@ -32,9 +32,9 @@ batch_size = 1000
 # there must be a weight vector for the cost of going between the edges
 # there must be a bias vector for all layers
 num_hidden = 30
-time_steps = 30
+time_steps = 16
 num_input = time_steps * note_range
-num_epochs = 1000
+num_epochs = 3000
 activation_function = tf.sigmoid
 
 x = tf.placeholder(tf.float32, shape=[None, num_input], name="x")
@@ -71,6 +71,7 @@ tf.subtract(tf.matmul(tf.transpose(x), h), tf.matmul(tf.transpose(x_sample), h_s
 bv_adder = tf.multiply(lr / size_bt, tf.reduce_sum(tf.subtract(x, x_sample), 0, True))
 bh_adder = tf.multiply(lr / size_bt, tf.reduce_sum(tf.subtract(h, h_sample), 0, True))
 updt = [w.assign_add(w_adder), bv.assign_add(bv_adder), bh.assign_add(bh_adder)]
+loss = tf.summary.scalar("Loss", tf.log(w_adder))
 
 with tf.Session() as sess:
   init = tf.global_variables_initializer()
@@ -85,6 +86,7 @@ with tf.Session() as sess:
       phrase = np.array(phrase)
       phrase = phrase[:int(np.floor(phrase.shape[0]/time_steps)* time_steps)]
       phrase = np.reshape(phrase, [int(phrase.shape[0]/time_steps), int(phrase.shape[1] * time_steps)])
+      print(tf.summary.get_summary_description(loss))
 
       for i in range(1, len(phrase), batch_size):
         tr_x = phrase[i:i+batch_size]
