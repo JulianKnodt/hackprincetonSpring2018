@@ -17,7 +17,7 @@ def classify_phrase(phrase):
     minV = min(note.pitch.frequency, minV)
     maxV = max(note.pitch.frequency, maxV)
     mean_value += note.pitch.frequency
-  mean_value /= len(phrase)
+  if length != 0:  mean_value /= len(phrase)
   note_range = maxV-minV
   return {
     'length': length,
@@ -74,8 +74,13 @@ url = 'http://www.bachcentral.com/sinfon'
 
 classification_functions = [is_accelerating, is_deccelerating]
 def classifications_for(phrase):
-  phraseClassifications = phraseReader(phrase)
-  return phraseClassifications + list(map(lambda c: c(phrase), classification_functions))
+  result = 0
+  for note in phrase:
+    if note.isRest or note.isChord: continue
+    result += note.pitch.diatonicNoteNum * note.offset/len(phrase) + (note.pitch.accidental == None)
+  return [round(result)]
+#  phraseClassifications = phraseReader(phrase)
+#  return phraseClassifications + list(map(lambda c: c(phrase), classification_functions))
 
 
 def concat_phrases(phrases):

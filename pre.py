@@ -10,7 +10,7 @@ from collections import defaultdict
 from scipy import sparse
 
 
-def parseStream(filename, s):
+def parseStream(s):
     orig_stdout = sys.stdout
     #f = open("GoldbergVariationsRawData.csv", 'w')
 
@@ -22,7 +22,6 @@ def parseStream(filename, s):
     phraseStarts = [0]
     noteCounter = 0
 
-    # for filename in os.listdir(path):
     for i in range(1):
         for i in s:
             previousNote = note.Note("C8")
@@ -86,10 +85,8 @@ def parseStream(filename, s):
                         phraseStarts.append(noteCounter - 1)
                         previousChanges24 = []
 
-                    print(str(thisNote.pitch) + str(thisNote.quarterLength))
                     if (thisNote.quarterLength == 1.0 or thisNote.quarterLength == 2.0):
-                        if (previousDurations30[bb-5] == 0.25 and previousDurations30[bb-4] == 0.25 and previousDurations30[bb-3] == 0.25 and previousDurations30[bb-2] == 0.25):
-                            # print("Phrase End quarter after sixteenths")
+                        if (bb > 5 and previousDurations30[bb-5] == 0.25 and previousDurations30[bb-4] == 0.25 and previousDurations30[bb-3] == 0.25 and previousDurations30[bb-2] == 0.25):
                             phraseStarts.append(noteCounter)
                     noteCounter = noteCounter + 1
                     previousNote = thisNote
