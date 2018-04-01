@@ -10,11 +10,11 @@ from collections import defaultdict
 from scipy import sparse
 
 
-def parseStream(filename, s):
+def parseStream(s):
     orig_stdout = sys.stdout
-    f = open("GoldbergVariationsRawData.csv", 'w')
+    #f = open("GoldbergVariationsRawData.csv", 'w')
 
-    sys.stdout = f
+    #sys.stdout = f
 
 
     previousDurations30 = []
@@ -22,7 +22,6 @@ def parseStream(filename, s):
     phraseStarts = [0]
     noteCounter = 0
 
-    # for filename in os.listdir(path):
     for i in range(1):
         for i in s:
             previousNote = note.Note("C8")
@@ -86,10 +85,8 @@ def parseStream(filename, s):
                         phraseStarts.append(noteCounter - 1)
                         previousChanges24 = []
 
-                    print(str(thisNote.pitch) + str(thisNote.quarterLength))
                     if (thisNote.quarterLength == 1.0 or thisNote.quarterLength == 2.0):
-                        if (previousDurations30[bb-5] == 0.25 and previousDurations30[bb-4] == 0.25 and previousDurations30[bb-3] == 0.25 and previousDurations30[bb-2] == 0.25):
-                            # print("Phrase End quarter after sixteenths")
+                        if (bb > 5 and previousDurations30[bb-5] == 0.25 and previousDurations30[bb-4] == 0.25 and previousDurations30[bb-3] == 0.25 and previousDurations30[bb-2] == 0.25):
                             phraseStarts.append(noteCounter)
                     noteCounter = noteCounter + 1
                     previousNote = thisNote
@@ -104,8 +101,8 @@ def build_note_dict(notes):
         note_dict = dict(csv.reader(csv_file))
 
     noteList = []
-    for key, note in notes.itertuples():
-        if note not in note_dict:
+    for note in notes:
+        if note not in note_dict and note != 'end':
             noteList.append(note)
     possible_vals = sorted(set(noteList))
     startIndex = len(note_dict) + 1
@@ -166,9 +163,10 @@ def on_off_representation(streams, phraseStarts):
                         string_rep = str(n.pitch) + str(n.quarterLength)
                     rows.append(int(note_dict[string_rep]))
                     cols.append(step)
-                    rows.append(int(note_dict[string_rep]))
-                    cols.append(step + thirty_two_length - 1)
-                    data += [1,1]
+                    #rows.append(int(note_dict[string_rep]))
+                    #cols.append(step + thirty_two_length - 1)
+                    data += [1]
+                    #data += [1,1]
                 step += thirty_two_length
                 current_notes = []
             else:
@@ -176,10 +174,77 @@ def on_off_representation(streams, phraseStarts):
             x += 1
     return phrases
 
+
+def on_off_representation_from_csv(notes, phraseStarts):
+    with open('indexes.csv', 'r', encoding='utf-8') as csv_file:
+        note_dict = dict(csv.reader(csv_file))
+
+    phrases = []
+    x = 0
+    for note in notes:
+        if note == 'end':
+            continue
+
+        if (x in phraseStarts):
+            if (x != 0 and len(data) != 0):
+                bsr = sparse.bsr_matrix((np.array(data), (np.array(rows), np.array(cols)))).toarray()
+                shape = (len(note_dict), step)
+                bsr.resize(shape)
+                phrases.append(bsr)
+
+            step = 0
+            current_notes = []
+            rows = []
+            cols = []
+            data = []
+
+        counter = 2
+        if (note[1] == '#' or note[1] == '-'):
+            counter = counter+1
+
+        nDuration = ''
+        notecopy = note
+        for c in notecopy[counter:]:
+            if (c != "'" and c != "]"):
+                nDuration += c
+        for c in nDuration:
+            if (c == "/"):
+                numerator = ""
+                denominator = ""
+                for c2 in nDuration:
+                    if (c2 == "/"):
+                        break
+                    numerator += c2
+                start = False
+                for c2 in nDuration:
+                    if (c2 == "'"):
+                        break
+                    if (start):
+                        denominator += c2
+                    if (c2 == "/"):
+                        start = True
+
+                nDuration = float(float(numerator)/float(denominator))
+
+        thirty_two_length = int(float(nDuration) * 8)
+        if (thirty_two_length != 0):
+            current_notes.append(str(note))
+            for n in current_notes:
+                if len(n) != 1:
+                    rows.append(int(note_dict[n]))
+                    cols.append(step)
+                    data += [1]
+            step += thirty_two_length
+            current_notes = []
+        else:
+            current_notes += note
+        x += 1
+    return phrases
+
 def sample():
     training_notes = pd.read_csv("GoldbergVariationsRawData.csv", index_col=None)
+    training_notes = training_notes['Notes'].tolist()
     build_note_dict(training_notes)
-    filename = '988-v01.mid'
-    streams = converter.parse(filename)
-    phraseStarts = parseStream(filename, streams)
-    on_off_representation(streams, phraseStarts)
+    phraseStarts = pd.read_csv("GoldbergPhraseStarts.csv", index_col=None)
+    phraseStarts = phraseStarts['0'].tolist()
+    return(on_off_representation_from_csv(training_notes, phraseStarts))

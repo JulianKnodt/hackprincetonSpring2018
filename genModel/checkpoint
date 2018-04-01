@@ -1,0 +1,2 @@
+model_checkpoint_path: "gen{num_hidden}.ckpt"
+all_model_checkpoint_paths: "gen{num_hidden}.ckpt"

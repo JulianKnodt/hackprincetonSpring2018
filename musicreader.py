@@ -2,28 +2,41 @@ from music21 import *
 import csv
 import sys
 import os
+import numpy as np
 
-orig_stdout = sys.stdout
-orig_stdout = sys.stdout
-d = open('notedata.txt', 'w')
+def convert_generated_to_indexes(generated):
+    notes_int = []
+    nz = np.sort(np.transpose(np.nonzero(generated)),axis=0,)
+    for row in nz:
+      notes_int += [row[0]]
+    return notes_int
 
-# sys.stdout = d
+test = np.ceil(np.random.rand(4,4))
+print(test)
+print(convert_generated_to_indexes(test))
 
-f = open('GoldbergShortLong.csv', 'r')
-reader = csv.reader(f)
+def convert_int_to_string(ints):
+    with open('indexes.csv', 'r', encoding='utf-8') as csv_file:
+        note_dict = dict(csv.reader(csv_file))
+    note_dict_reversed = dict((intVal, note) for note, intVal in note_dict.items())
 
-streamstream = stream.Stream()
-firstrow = True
-for row in reader:
-    counter = 2
-    if (firstrow):
-        firstrow = False
-        continue
-    if (str(row)[2:5] != 'end' and str(row)[2:7] != "Notes"):
+    string_reps = []
+    for i in ints:
+        string_reps += [note_dict_reversed[str(i+1)]]
+
+    return string_reps
+
+
+
+def read_to_midi(generated, fileName):
+    streamstream = stream.Stream()
+    strings = convert_int_to_string(convert_generated_to_indexes(generated))
+    for row in strings:
+        counter = 0
         nPitch = str(row)[counter]
         counter = counter+1
         nPitch += str(row)[counter]
-        if (str(row)[3] == '#' or str(row)[3] == '-'):
+        if (str(row)[1] == '#' or str(row)[1] == '-'):
             counter = counter+1
             nPitch += str(row)[counter]
         nDuration = ''
@@ -32,7 +45,13 @@ for row in reader:
         for c in str(row)[counter:]:
             if (c != "'" and c != "]"):
                 nDuration += c
-        noteNew = note.Note(nPitch)
+        if (nPitch == 'R0'):
+            noteNew = note.Rest(nDuration)
+        else:
+            try:
+                noteNew = note.Note(nPitch)
+            except:
+                break
         for c in nDuration:
             if (c == "/"):
                 numerator = ""
@@ -51,12 +70,13 @@ for row in reader:
                         start = True
                 nDuration = float(float(numerator)/float(denominator))
 
-        noteNew.quarterLength = float(nDuration)
+        try:
+            noteNew.quarterLength = float(nDuration)
+        except ValueError:
+            continue
         streamstream.append(noteNew)
+    fp = streamstream.write('midi', fileName + '.mid')
+    print("written" + fileName)
 
-print(len(streamstream))
-print("Reached")
 
-
-fp = streamstream.write('midi', 'test.mid')
-print("written")
+read_to_midi(test, 'TESTIN_CODE')
