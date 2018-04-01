@@ -12,8 +12,8 @@ from musicreader import read_to_midi
 def randSparseTensor(shape):
   return np.round(np.random.rand(shape[0], shape[1]))
 
-note_range = 470 # num of notes
-# this file generates phrases based on input phrases 
+note_range = 471 # num of notes
+# this file generates phrases based on input phrases
 def getPhrases(test=False):
   if test:
     amtSample = 10
@@ -21,19 +21,20 @@ def getPhrases(test=False):
   return list(("CLASSIFICATION", np.transpose(phrase)) for phrase in sampleData())
 
 phrases = getPhrases(False)
+print(len(phrases))
 # hyperparameters
-lr = tf.constant(0.005, tf.float32)
-batch_size = 100
+lr = tf.constant(0.05, tf.float32)
+batch_size = 1000
 
 # neural net parameters
 # num of visible nodes must match input size or input size must be truncated
 # size of hidden layer is expected number of outputs (which in this case is set of all possible notes
 # there must be a weight vector for the cost of going between the edges
 # there must be a bias vector for all layers
-num_hidden = 128
-time_steps = 16
+num_hidden = 30
+time_steps = 30
 num_input = time_steps * note_range
-num_epochs = 200
+num_epochs = 1000
 activation_function = tf.sigmoid
 
 x = tf.placeholder(tf.float32, shape=[None, num_input], name="x")
@@ -74,7 +75,9 @@ updt = [w.assign_add(w_adder), bv.assign_add(bv_adder), bh.assign_add(bh_adder)]
 with tf.Session() as sess:
   init = tf.global_variables_initializer()
   saver = tf.train.Saver()
+  # saver.restore(sess, "./genModel/gen{num_hidden}.ckpt")
   sess.run(init)
+  # saver.restore(sess, './genModel/gen{num_hidden}.ckpt')
   #updt= contrastive_divergence(learning_rate)
   for epoch in tqdm(range(num_epochs)):
     for _classification, phrase in phrases:
@@ -86,13 +89,16 @@ with tf.Session() as sess:
       for i in range(1, len(phrase), batch_size):
         tr_x = phrase[i:i+batch_size]
         sess.run(updt, feed_dict={x: tr_x})
-  _save_path = saver.save(sess, './genModel/gen.ckpt')
-  NUM_SAMPLE_OUTPUTS = 50
-  samples = gibbs_sample(1).eval(session = sess, feed_dict = {x: np.zeros((NUM_SAMPLE_OUTPUTS, num_input))})
-  for i in range(samples.shape[0]):
-    if not any(samples[i, :]):
-      continue
-    S = np.reshape(samples[i,:], (time_steps, note_range))
-    read_to_midi(S, "standard")
-    read_to_midi(np.transpose(S), "transposed")
-    print(S)
+  _save_path = saver.save(sess, "./genModel/gen{num_hidden}.ckpt")
+  NUM_SAMPLE_OUTPUTS = 40000
+  retrieved = 0
+  while retrieved < 100:
+      samples = gibbs_sample(1).eval(session = sess, feed_dict = {x: np.zeros((NUM_SAMPLE_OUTPUTS, num_input))})
+      for i in range(samples.shape[0]):
+        if not any(samples[i, :]):
+            continue
+        S = np.reshape(samples[i,:], (time_steps, note_range))
+        read_to_midi(S, "normal" + str(retrieved))
+        read_to_midi(np.transpose(S), "transposed" + str(retrieved))
+        retrieved += 1
+        print(S)

@@ -8,7 +8,7 @@ from collections import defaultdict
 
 def parseStream(filename, s):
     orig_stdout = sys.stdout
-    f = open('GoldbergFirstOneHundred.csv', 'w')
+    f = open("GoldbergVariationsRawData.csv", 'w')
 
     sys.stdout = f
 
