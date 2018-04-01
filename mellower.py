@@ -65,9 +65,16 @@ def mellower(notes):
                 returnNotes2.append(thisNote)
             counter = counter + 1
             previousNote = thisNote
-
-
     return reversed(returnNotes2)
+
+notes = converter.parse("transposed1456.mid")
+better = mellower(notes[0].notesAndRests)
+streamstream = stream.Stream()
+for n in better:
+    print(n)
+    streamstream.append(n)
+streamstream.write('midi', 'test.mid')
+
 #
 # n1 = note.Rest()
 # n2 = note.Note('e3')
