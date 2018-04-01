@@ -100,4 +100,4 @@ def extract_classifications(output_concat_phrases):
   return result
 
 # TEST:
-print(extract_classifications(concat_phrases(phrases(m21.converter.parse('http://www.bachcentral.com/WTCBkI/Fugue1.mid'), [10]))))
+#print(extract_classifications(concat_phrases(phrases(m21.converter.parse('http://www.bachcentral.com/WTCBkI/Fugue1.mid'), [10]))))
