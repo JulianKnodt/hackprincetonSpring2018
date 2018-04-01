@@ -2,6 +2,7 @@ import urllib.request as req
 import numpy as np
 import music21 as m21
 import math
+from phraseReader import phraseReader
 
 def classify_phrase(phrase):
   minV = math.inf
@@ -26,14 +27,14 @@ def classify_phrase(phrase):
   }
 
 def is_accelerating(phrase):
-  durations = map(lambda note: note.duration.quarterLength, phrase)
+  durations = list(map(lambda note: note.duration.quarterLength, phrase))
   for first, second in zip(durations, durations[1:]):
     if second - first > 0.5:
       return False
   return True
 
 def is_deccelerating(phrase):
-  durations = map(lambda note: note.duration.quarterLength, phrase)
+  durations = list(map(lambda note: note.duration.quarterLength, phrase))
   for first, second in zip(durations, durations[1:]):
     if second - first > - 0.5:
       return False
@@ -71,12 +72,16 @@ url = 'http://www.bachcentral.com/sinfon'
 #for i in range(1, 15):
 #  print(generate_csv(url + f'/sinfon{i}.mid'))
 
-
 classification_functions = [is_accelerating, is_deccelerating]
+def classifications_for(phrase):
+  phraseClassifications = phraseReader(phrase)
+  return phraseClassifications + list(map(lambda c: c(phrase), classification_functions))
+
+
 def concat_phrases(phrases):
   return map(lambda phrase: {
       "summary": classify_phrase(phrase),
-      "classifications": map(lambda c: c(phrase), classification_functions),
+      "classifications": classifications_for(phrase),
       "phrase": phrase,
     }, phrases)
 
