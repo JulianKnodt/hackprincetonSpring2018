@@ -6,3 +6,4 @@ __pycache__
 /include
 pip-selfcheck.json
 *.swp
+/genModel
