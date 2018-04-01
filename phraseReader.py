@@ -18,7 +18,6 @@ def phraseReader(notes):
         continue
     if isinstance(note, m21.note.Note):
         pd30 += [note.quarterLength]
-        print(note)
         previousChanges24 += [prevNote.pitch.diatonicNoteNum - note.pitch.diatonicNoteNum]
 
         n = len(previousChanges24)
@@ -48,4 +47,3 @@ def phraseReader(notes):
         phraseDefinition[4] = True
     return phraseDefinition
 
-phraseReader(m21.converter.parse('http://www.bachcentral.com/WTCBkI/Fugue1.mid'))

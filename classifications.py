@@ -85,5 +85,14 @@ def concat_phrases(phrases):
       "phrase": phrase,
     }, phrases)
 
+def extract_classifications(output_concat_phrases):
+  result = []
+  for phrase in output_concat_phrases:
+    sum = 0
+    for i, y in enumerate(phrase['classifications']):
+      sum += (y << i)
+    result += [sum]
+  return result
+
 # TEST:
-print(list(concat_phrases(phrases(m21.converter.parse('http://www.bachcentral.com/WTCBkI/Fugue1.mid'), [10])))[0])
+print(extract_classifications(concat_phrases(phrases(m21.converter.parse('http://www.bachcentral.com/WTCBkI/Fugue1.mid'), [10]))))
