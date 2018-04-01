@@ -15,7 +15,7 @@ def mellower(notes):
         avg = 0
         if (counter == 0):
             avg = (thisNote.pitch.diatonicNoteNum + notesNext[counter].pitch.diatonicNoteNum) / 2
-        if (counter < len(notes) - 1):
+        elif (counter < len(notes) - 1):
             avg = (previousNote.pitch.diatonicNoteNum + notesNext[counter].pitch.diatonicNoteNum + thisNote.pitch.diatonicNoteNum) / 3
         if (counter == len(notes) - 1):
             avg = (previousNote.pitch.diatonicNoteNum + thisNote.pitch.diatonicNoteNum) / 2
@@ -34,24 +34,24 @@ def mellower(notes):
         returnNotes2.append(thisNote.transpose(interval.GenericInterval(int(avg) - thisNote.pitch.diatonicNoteNum)))
         counter = counter + 1
         previousNote = thisNote
-    return returnNotes2
+    return reversed(returnNotes2)
 
-# n1 = note.Note("c2")
-# n2 = note.Note('e3')
-# n3 = note.Note('f3')
-# n4 = note.Note('g2')
-# n5 = note.Note('b4')
-# n6 = note.Note('b5')
-# n7 = note.Note('c4')
-#
-# noteos = [n1, n2, n3, n4, n5, n6, n7]
-# print (noteos)
-# for i in noteos:
-#     print(i.pitch.diatonicNoteNum)
-# new = mellower(noteos)
-# print (new)
-# for i in new:
-#     print(i.pitch.diatonicNoteNum)
+n1 = note.Note("c2")
+n2 = note.Note('e3')
+n3 = note.Note('f3')
+n4 = note.Note('g2')
+n5 = note.Note('b4')
+n6 = note.Note('b5')
+n7 = note.Note('c4')
+
+noteos = [n1, n2, n3, n4, n5, n6, n7]
+print (noteos)
+for i in noteos:
+    print(i.pitch.diatonicNoteNum)
+new = mellower(noteos)
+print (new)
+for i in new:
+    print(i.pitch.diatonicNoteNum)
 
 # c4 = note.Note("c4")
 # print(c4.pitch.diatonicNoteNum)
