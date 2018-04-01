@@ -45,7 +45,13 @@ def read_to_midi(generated, fileName):
         for c in str(row)[counter:]:
             if (c != "'" and c != "]"):
                 nDuration += c
-        noteNew = note.Note(nPitch)
+        if (nPitch == 'R0'):
+            noteNew = note.Rest(nDuration)
+        else:
+            try:
+                noteNew = note.Note(nPitch)
+            except:
+                break
         for c in nDuration:
             if (c == "/"):
                 numerator = ""
@@ -67,7 +73,7 @@ def read_to_midi(generated, fileName):
         noteNew.quarterLength = float(nDuration)
         streamstream.append(noteNew)
     fp = streamstream.write('midi', fileName + '.mid')
-    print("written")
+    print("written" + fileName)
 
 
 read_to_midi(test, 'TESTIN_CODE')

@@ -1,8 +1,10 @@
-__pycache__
 *.ckpt
 .Python
+__pycache__
 /bin
 /lib
 /include
 pip-selfcheck.json
 *.swp
+/genModel
+*.mid
