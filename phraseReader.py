@@ -7,7 +7,7 @@ from collections import defaultdict
 
 # Returns a value 1, 2, 3, 4, or 5 depending on the phrase identified
 def phraseReader(notes):
-    phraseDefinition = [False, False, False, False, False, False]
+    phraseDefinition = [False]*16
     pd30 = []
     previousChanges24 = []
     prevNote = m21.note.Note('c8')
@@ -16,7 +16,7 @@ def phraseReader(notes):
     for note in notes:
       if isinstance(note, m21.note.Rest):
         continue
-    if isinstance(note, m21.note.Note):
+      if isinstance(note, m21.note.Note):
         pd30 += [note.quarterLength]
         previousChanges24 += [prevNote.pitch.diatonicNoteNum - note.pitch.diatonicNoteNum]
 
@@ -34,7 +34,6 @@ def phraseReader(notes):
 
         if note.quarterLength == 1.0:
             if (bb > 5 and pd30[bb-5] == 0.25 and pd30[bb-4] == 0.25 and pd30[bb-3] == 0.25 and pd30[bb-2] == 0.25):
-                # print("Phrase End quarter after sixteenths")
                 phraseDefinition[2] = True
 
         if note.quarterLength >= 2.0:
@@ -45,5 +44,6 @@ def phraseReader(notes):
 
     if not any(phraseDefinition):
         phraseDefinition[4] = True
+    phraseDefinition[min(round(len(notes)/2), 10) + 4]
     return phraseDefinition
 
